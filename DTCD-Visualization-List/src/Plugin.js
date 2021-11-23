@@ -16,9 +16,12 @@ export class VisualizationList extends PanelPlugin {
   #colTitle;
   #colSubTitle;
   #colIsColoredTitle;
-  #dataSource;
+  #dataSourceName;
+  #tokenName;
   #storageSystem;
-
+  #guid;
+  #eventSystem;
+  #dataSourceSystemGUID;
 
   static getRegistrationMeta() {
     return pluginMeta;
@@ -29,16 +32,23 @@ export class VisualizationList extends PanelPlugin {
 
     const logSystem = new LogSystemAdapter(guid, pluginMeta.name);
     const eventSystem = new EventSystemAdapter(guid);
+    const storageSystem = new StorageSystemAdapter();
+
 
     eventSystem.registerPluginInstance(this);
-    this.#storageSystem = new StorageSystemAdapter();
+    this.#storageSystem = storageSystem;
+
+    this.#guid = guid;
+    this.#eventSystem = eventSystem;
 
     const { default: VueJS } = this.getDependence('Vue');
 
     const view = new VueJS({
-      data: () => ({ guid, logSystem, eventSystem }),
+      data: () => ({ guid, logSystem, eventSystem, storageSystem }),
       render: h => h(PluginComponent),
     }).$mount(selector);
+
+    this.#dataSourceSystemGUID = this.getGUID(this.getSystem('DataSourceSystem'));
 
     this.vueComponent = view.$children[0];
     this.#isMarkedItems = false;
@@ -47,7 +57,8 @@ export class VisualizationList extends PanelPlugin {
     this.#colTitle = 'title';
     this.#colSubTitle = 'subtitle';
     this.#colIsColoredTitle = 'coloredTitle';
-    this.#dataSource = '';
+    this.#dataSourceName = '';
+    this.#tokenName = '';
   }
 
   setPluginConfig(config = {}) {
@@ -58,7 +69,8 @@ export class VisualizationList extends PanelPlugin {
       colTitle,
       colSubTitle,
       colIsColoredTitle,
-      dataSource
+      dataSource,
+      tokenName,
     } = config;
 
     if (typeof isMarkedItems !== 'undefined') {
@@ -92,12 +104,36 @@ export class VisualizationList extends PanelPlugin {
     }
 
     if (dataSource !== '' && typeof dataSource !== 'undefined') {
-      this.#dataSource = dataSource;
-      const DS = this.getSystem('DataSourceSystem').getDataSource(this.#dataSource);
+      if (this.#dataSourceName) {
+        this.#eventSystem.unsubscribe(
+          this.#dataSourceSystemGUID,
+          'DataSourceStatusUpdate',
+          this.#guid,
+          'processDataSourceEvent',
+          { dataSource: this.#dataSourceName, status: 'success' },
+        );
+      }
+
+      this.#dataSourceName = dataSource;
+
+      this.#eventSystem.subscribe(
+        this.#dataSourceSystemGUID,
+        'DataSourceStatusUpdate',
+        this.#guid,
+        'processDataSourceEvent',
+        { dataSource, status: 'success' }
+      );
+
+      const DS = this.getSystem('DataSourceSystem').getDataSource(this.#dataSourceName);
       if (DS.status === 'success') {
-        const data = this.#storageSystem.session.getRecord(this.#dataSource);
+        const data = this.#storageSystem.session.getRecord(this.#dataSourceName);
         this.loadData(data);
       }
+    }
+
+    if (typeof tokenName === 'string') {
+      this.#tokenName = tokenName;
+      this.vueComponent.setConfig('tokenName', tokenName);
     }
   }
 
@@ -109,7 +145,8 @@ export class VisualizationList extends PanelPlugin {
     if (typeof this.#colBackColor !== 'undefined') config.colBackColor = this.#colBackColor;
     if (typeof this.#colTitle !== 'undefined') config.colTitle = this.#colTitle;
     if (typeof this.#colSubTitle !== 'undefined') config.colSubTitle = this.#colSubTitle;
-    if (typeof this.#dataSource !== 'undefined') config.dataSource = this.#dataSource;
+    if (typeof this.#dataSourceName !== 'undefined') config.dataSource = this.#dataSourceName;
+    if (typeof this.#tokenName !== 'undefined') config.tokenName = this.#tokenName;
     return config;
   }
 
@@ -119,8 +156,8 @@ export class VisualizationList extends PanelPlugin {
 
   processDataSourceEvent(eventData) {
     const { dataSource, status } = eventData;
-    this.#dataSource = dataSource;
-    const data = this.#storageSystem.session.getRecord(this.#dataSource);
+    this.#dataSourceName = dataSource;
+    const data = this.#storageSystem.session.getRecord(this.#dataSourceName);
     this.loadData(data);
   }
 

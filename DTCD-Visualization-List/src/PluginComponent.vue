@@ -5,6 +5,7 @@
       :key="`item-${i}`"
       class="list-item"
       :style="{ backgroundColor: item[colBackColor] }"
+      @click="clickListItem(item)"
     >
       <div v-show="isMarkedItems" class="item-icon">
         <svg width="12" height="12" viewBox="0 0 12 12">
@@ -29,6 +30,7 @@ export default {
   data: (self) => ({
     logSystem: self.$root.logSystem,
     eventSystem: self.$root.eventSystem,
+    storageSystem: self.$root.storageSystem,
     isMarkedItems: true,
     colColor: 'color',
     colBackColor: 'backColor',
@@ -36,11 +38,11 @@ export default {
     colSubTitle: 'subTitle',
     colIsColoredTitle: 'coloredTitle',
     dataset: [],
+    tokenName: '',
   }),
   methods: {
     setConfig(name, value) {
       this[name] = value;
-      console.log(name, value);
     },
 
     getFromItem(item, key) {
@@ -49,7 +51,16 @@ export default {
 
     setDataset(data = []) {
       this.dataset = data;
-    }
+    },
+
+    clickListItem(item) {
+      if (this.tokenName) {
+        this.storageSystem.tokenStorage.putRecord(
+          this.tokenName,
+          item[this.colTitle]
+        );
+      }
+    },
   },
 };
 </script>
