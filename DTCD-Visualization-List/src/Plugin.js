@@ -9,7 +9,6 @@ import {
 } from './../../DTCD-SDK';
 
 export class VisualizationList extends PanelPlugin {
-
   #isMarkedItems;
   #colColor;
   #colBackColor;
@@ -17,7 +16,7 @@ export class VisualizationList extends PanelPlugin {
   #colSubTitle;
   #colIsColoredTitle;
   #dataSourceName;
-  #tokenName;
+  // #tokenName;
   #storageSystem;
   #guid;
   #eventSystem;
@@ -27,7 +26,7 @@ export class VisualizationList extends PanelPlugin {
     return pluginMeta;
   }
 
-  constructor (guid, selector) {
+  constructor(guid, selector) {
     super();
 
     const logSystem = new LogSystemAdapter(guid, pluginMeta.name);
@@ -57,7 +56,7 @@ export class VisualizationList extends PanelPlugin {
     this.#colSubTitle = 'subTitle';
     this.#colIsColoredTitle = 'coloredTitle';
     this.#dataSourceName = '';
-    this.#tokenName = '';
+    // this.#tokenName = '';
   }
 
   setPluginConfig(config = {}) {
@@ -69,7 +68,7 @@ export class VisualizationList extends PanelPlugin {
       colSubTitle,
       colIsColoredTitle,
       dataSource,
-      tokenName,
+      // tokenName,
     } = config;
 
     if (typeof isMarkedItems !== 'undefined') {
@@ -109,7 +108,7 @@ export class VisualizationList extends PanelPlugin {
           'DataSourceStatusUpdate',
           this.#guid,
           'processDataSourceEvent',
-          { dataSource: this.#dataSourceName, status: 'success' },
+          { dataSource: this.#dataSourceName, status: 'success' }
         );
       }
 
@@ -130,22 +129,23 @@ export class VisualizationList extends PanelPlugin {
       }
     }
 
-    if (typeof tokenName === 'string') {
-      this.#tokenName = tokenName;
-      this.vueComponent.setConfig('tokenName', tokenName);
-    }
+    // if (typeof tokenName === 'string') {
+    //   this.#tokenName = tokenName;
+    //   this.vueComponent.setConfig('tokenName', tokenName);
+    // }
   }
 
   getPluginConfig() {
     const config = {};
     if (typeof this.#isMarkedItems !== 'undefined') config.isMarkedItems = this.#isMarkedItems;
-    if (typeof this.#colIsColoredTitle !== 'undefined') config.colIsColoredTitle = this.#colIsColoredTitle;
+    if (typeof this.#colIsColoredTitle !== 'undefined')
+      config.colIsColoredTitle = this.#colIsColoredTitle;
     if (typeof this.#colColor !== 'undefined') config.colColor = this.#colColor;
     if (typeof this.#colBackColor !== 'undefined') config.colBackColor = this.#colBackColor;
     if (typeof this.#colTitle !== 'undefined') config.colTitle = this.#colTitle;
     if (typeof this.#colSubTitle !== 'undefined') config.colSubTitle = this.#colSubTitle;
     if (typeof this.#dataSourceName !== 'undefined') config.dataSource = this.#dataSourceName;
-    if (typeof this.#tokenName !== 'undefined') config.tokenName = this.#tokenName;
+    // if (typeof this.#tokenName !== 'undefined') config.tokenName = this.#tokenName;
     return config;
   }
 
@@ -163,5 +163,4 @@ export class VisualizationList extends PanelPlugin {
   setFormSettings() {}
 
   getFormSettings() {}
-
 }
