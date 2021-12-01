@@ -34,7 +34,6 @@ export class VisualizationList extends PanelPlugin {
     const eventSystem = new EventSystemAdapter(guid);
     const storageSystem = new StorageSystemAdapter();
 
-
     eventSystem.registerPluginInstance(this);
     this.#storageSystem = storageSystem;
 
@@ -55,7 +54,7 @@ export class VisualizationList extends PanelPlugin {
     this.#colColor = 'color';
     this.#colBackColor = 'backColor';
     this.#colTitle = 'title';
-    this.#colSubTitle = 'subtitle';
+    this.#colSubTitle = 'subTitle';
     this.#colIsColoredTitle = 'coloredTitle';
     this.#dataSourceName = '';
     this.#tokenName = '';

@@ -4,8 +4,9 @@
       v-for="(item, i) in dataset"
       :key="`item-${i}`"
       class="list-item"
+      :class="{ selected: i === selectedItem }"
       :style="{ backgroundColor: item[colBackColor] }"
-      @click="clickListItem(item)"
+      @click="clickListItem(item, i)"
     >
       <div v-show="isMarkedItems" class="item-icon">
         <svg width="12" height="12" viewBox="0 0 12 12">
@@ -31,6 +32,7 @@ export default {
     logSystem: self.$root.logSystem,
     eventSystem: self.$root.eventSystem,
     storageSystem: self.$root.storageSystem,
+    selectedItem: null,
     isMarkedItems: true,
     colColor: 'color',
     colBackColor: 'backColor',
@@ -50,10 +52,12 @@ export default {
     },
 
     setDataset(data = []) {
+      this.selectedItem = null;
       this.dataset = data;
     },
 
-    clickListItem(item) {
+    clickListItem(item, itenIndex) {
+      this.selectedItem = itenIndex;
       if (this.tokenName) {
         this.storageSystem.tokenStorage.putRecord(
           this.tokenName,
