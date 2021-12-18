@@ -16,11 +16,10 @@ export class VisualizationList extends PanelPlugin {
   #colSubTitle;
   #colIsColoredTitle;
   #dataSourceName;
-  // #tokenName;
+  #dataSourceSystemGUID;
   #storageSystem;
   #guid;
   #eventSystem;
-  #dataSourceSystemGUID;
 
   static getRegistrationMeta() {
     return pluginMeta;
@@ -160,7 +159,81 @@ export class VisualizationList extends PanelPlugin {
     this.loadData(data);
   }
 
-  setFormSettings() {}
+  setFormSettings(config) {
+    return this.setPluginConfig(config);
+  }
 
-  getFormSettings() {}
+  getFormSettings() {
+    return {
+      fields: [
+        {
+          component: 'title',
+          propValue: 'Общие настройки',
+        },
+        {
+          component: 'checkbox',
+          propName: 'isMarkedItems',
+          attrs: { label: 'Маркировка списка' },
+        },
+        {
+          component: 'title',
+          propValue: 'Источник данных',
+        },
+        {
+          component: 'datasource',
+          propName: 'dataSource',
+          attrs: {
+            label: 'Выберите источник данных',
+            placeholder: 'Выберите значение',
+            required: true,
+          },
+        },
+        {
+          component: 'text',
+          propName: 'colIsColoredTitle',
+          attrs: {
+            label: 'Имя колонки с флагом окраски заголовка',
+            propValue: 'coloredTitle',
+            required: true,
+          },
+        },
+        {
+          component: 'text',
+          propName: 'colColor',
+          attrs: {
+            label: 'Имя колонки с цветом заголовка',
+            propValue: 'color',
+            required: true,
+          },
+        },
+        {
+          component: 'text',
+          propName: 'colBackColor',
+          attrs: {
+            label: 'Имя колонки с цветом фона',
+            propValue: 'backColor',
+            required: true,
+          },
+        },
+        {
+          component: 'text',
+          propName: 'colTitle',
+          attrs: {
+            label: 'Имя колонки с цветом фона',
+            propValue: 'title',
+            required: true,
+          },
+        },
+        {
+          component: 'text',
+          propName: 'colSubTitle',
+          attrs: {
+            label: 'Имя колонки с подзаголовком',
+            propValue: 'subTitle',
+            required: true,
+          },
+        },
+      ],
+    };
+  }
 }
