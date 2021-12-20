@@ -12,3 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - token support
 - list item highlight after click
 - tests init
+
+### Changed
+- settings form config

@@ -55,7 +55,6 @@ export class VisualizationList extends PanelPlugin {
     this.#colSubTitle = 'subTitle';
     this.#colIsColoredTitle = 'coloredTitle';
     this.#dataSourceName = '';
-    // this.#tokenName = '';
   }
 
   setPluginConfig(config = {}) {
@@ -67,7 +66,6 @@ export class VisualizationList extends PanelPlugin {
       colSubTitle,
       colIsColoredTitle,
       dataSource,
-      // tokenName,
     } = config;
 
     if (typeof isMarkedItems !== 'undefined') {
@@ -127,11 +125,6 @@ export class VisualizationList extends PanelPlugin {
         this.loadData(data);
       }
     }
-
-    // if (typeof tokenName === 'string') {
-    //   this.#tokenName = tokenName;
-    //   this.vueComponent.setConfig('tokenName', tokenName);
-    // }
   }
 
   getPluginConfig() {
@@ -144,7 +137,6 @@ export class VisualizationList extends PanelPlugin {
     if (typeof this.#colTitle !== 'undefined') config.colTitle = this.#colTitle;
     if (typeof this.#colSubTitle !== 'undefined') config.colSubTitle = this.#colSubTitle;
     if (typeof this.#dataSourceName !== 'undefined') config.dataSource = this.#dataSourceName;
-    // if (typeof this.#tokenName !== 'undefined') config.tokenName = this.#tokenName;
     return config;
   }
 
@@ -171,11 +163,6 @@ export class VisualizationList extends PanelPlugin {
           propValue: 'Общие настройки',
         },
         {
-          component: 'checkbox',
-          propName: 'isMarkedItems',
-          attrs: { label: 'Маркировка списка' },
-        },
-        {
           component: 'title',
           propValue: 'Источник данных',
         },
@@ -185,6 +172,24 @@ export class VisualizationList extends PanelPlugin {
           attrs: {
             label: 'Выберите источник данных',
             placeholder: 'Выберите значение',
+            required: true,
+          },
+        },
+        {
+          component: 'text',
+          propName: 'colTitle',
+          attrs: {
+            label: 'Имя колонки с основным заголовком',
+            propValue: 'title',
+            required: true,
+          },
+        },
+        {
+          component: 'text',
+          propName: 'colSubTitle',
+          attrs: {
+            label: 'Имя колонки с подзаголовком',
+            propValue: 'subTitle',
             required: true,
           },
         },
@@ -216,22 +221,9 @@ export class VisualizationList extends PanelPlugin {
           },
         },
         {
-          component: 'text',
-          propName: 'colTitle',
-          attrs: {
-            label: 'Имя колонки с цветом фона',
-            propValue: 'title',
-            required: true,
-          },
-        },
-        {
-          component: 'text',
-          propName: 'colSubTitle',
-          attrs: {
-            label: 'Имя колонки с подзаголовком',
-            propValue: 'subTitle',
-            required: true,
-          },
+          component: 'checkbox',
+          propName: 'isMarkedItems',
+          attrs: { label: 'Включить маркировку списка' },
         },
       ],
     };
