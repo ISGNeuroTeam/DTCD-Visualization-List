@@ -6,9 +6,11 @@ import {
   LogSystemAdapter,
   EventSystemAdapter,
   StorageSystemAdapter,
+  DataSourceSystemAdapter,
 } from './../../DTCD-SDK';
 
 export class VisualizationList extends PanelPlugin {
+
   #isMarkedItems;
   #colColor;
   #colBackColor;
@@ -16,6 +18,7 @@ export class VisualizationList extends PanelPlugin {
   #colSubTitle;
   #colIsColoredTitle;
   #dataSourceName;
+  #dataSourceSystem;
   #dataSourceSystemGUID;
   #storageSystem;
   #guid;
@@ -28,15 +31,19 @@ export class VisualizationList extends PanelPlugin {
   constructor(guid, selector) {
     super();
 
-    const logSystem = new LogSystemAdapter(guid, pluginMeta.name);
-    const eventSystem = new EventSystemAdapter(guid);
-    const storageSystem = new StorageSystemAdapter();
+    const logSystem = new LogSystemAdapter('0.5.0', guid, pluginMeta.name);
+    const eventSystem = new EventSystemAdapter('0.4.0', guid);
+    const storageSystem = new StorageSystemAdapter('0.5.0');
 
     eventSystem.registerPluginInstance(this);
-    this.#storageSystem = storageSystem;
-
     this.#guid = guid;
     this.#eventSystem = eventSystem;
+    this.#storageSystem = storageSystem;
+    this.#dataSourceSystem = new DataSourceSystemAdapter('0.2.0');
+
+    this.#dataSourceSystemGUID = this.getGUID(
+      this.getSystem('DataSourceSystem', '0.2.0')
+    );
 
     const { default: VueJS } = this.getDependence('Vue');
 
@@ -44,8 +51,6 @@ export class VisualizationList extends PanelPlugin {
       data: () => ({ guid, logSystem, eventSystem, storageSystem }),
       render: h => h(PluginComponent),
     }).$mount(selector);
-
-    this.#dataSourceSystemGUID = this.getGUID(this.getSystem('DataSourceSystem'));
 
     this.vueComponent = view.$children[0];
     this.#isMarkedItems = false;
@@ -119,7 +124,8 @@ export class VisualizationList extends PanelPlugin {
         { dataSource, status: 'success' }
       );
 
-      const DS = this.getSystem('DataSourceSystem').getDataSource(this.#dataSourceName);
+      const DS = this.#dataSourceSystem.getDataSource(this.#dataSourceName);
+
       if (DS.status === 'success') {
         const data = this.#storageSystem.session.getRecord(this.#dataSourceName);
         this.loadData(data);
@@ -228,4 +234,5 @@ export class VisualizationList extends PanelPlugin {
       ],
     };
   }
+
 }
