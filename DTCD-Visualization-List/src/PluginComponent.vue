@@ -8,10 +8,13 @@
       :style="{ backgroundColor: item[colBackColor] }"
       @click="clickListItem(item, i)"
     >
-      <div v-show="isMarkedItems" class="item-icon">
-        <svg width="12" height="12" viewBox="0 0 12 12">
-          <circle cx="6" cy="6" r="6" :fill="getFromItem(item, colColor) || '#51515C'" />
-        </svg>
+      <div v-if="isMarkedItems" class="item-icon">
+        <span
+          class="FontIcon name_dot Marker"
+          :style="{
+            color: getFromItem(item, colColor) || 'var(--text_main)'
+          }"
+        />
       </div>
       <div class="item-content">
         <span
@@ -73,5 +76,51 @@ export default {
 </script>
 
 <style lang="sass">
-@import ./styles/component
+$border: 2px solid var(--background_secondary)
+
+.visualization-list-container
+  width: 100%
+  height: 100%
+  display: flex
+  flex-direction: column
+  overflow-y: auto
+  font-family: 'Proxima Nova'
+
+  .list-item
+    flex: 1 0
+    display: flex
+
+    &:not(:first-child)
+      border-top: $border
+
+    &:not(:last-child)
+      border-bottom: $border
+
+    &.selected
+      border: 2px solid var(--button_primary)
+
+    .item-icon
+      padding: 12px 16px
+      padding-right: 0
+
+      .Marker
+        font-size: 40px
+        margin-top: -10px
+        margin-left: -12px
+
+    .item-content
+      padding: 12px 16px
+
+      .main-text
+        color: var(--text_main)
+        font-size: 15px
+        font-weight: 600
+        line-height: 18px
+
+      .sub-text
+        color: var(--text_secondary)
+        font-size: 11px
+        font-weight: 400
+        line-height: 18px
+
 </style>
