@@ -11,18 +11,24 @@ import {
 
 export class VisualizationList extends PanelPlugin {
 
-  #isMarkedItems;
-  #colColor;
-  #colBackColor;
-  #colTitle;
-  #colSubTitle;
-  #colIsColoredTitle;
-  #dataSourceName;
+  #id;
+  #guid;
+  #logSystem;
+  #eventSystem;
+  #storageSystem;
   #dataSourceSystem;
   #dataSourceSystemGUID;
-  #storageSystem;
-  #guid;
-  #eventSystem;
+  #vueComponent;
+
+  #config = {
+    colTitle: 'title',
+    colSubTitle: 'subTitle',
+    colColor: 'color',
+    colBackColor: 'backColor',
+    colIsColoredTitle: 'isColoredTitle',
+    dataSource: '',
+    isMarkedItems: false,
+  };
 
   static getRegistrationMeta() {
     return pluginMeta;
@@ -31,12 +37,14 @@ export class VisualizationList extends PanelPlugin {
   constructor(guid, selector) {
     super();
 
-    const logSystem = new LogSystemAdapter('0.5.0', guid, pluginMeta.name);
     const eventSystem = new EventSystemAdapter('0.4.0', guid);
     const storageSystem = new StorageSystemAdapter('0.5.0');
 
     eventSystem.registerPluginInstance(this);
+
     this.#guid = guid;
+    this.#id = `${pluginMeta.name}[${guid}]`;
+    this.#logSystem = new LogSystemAdapter('0.5.0', guid, pluginMeta.name);;
     this.#eventSystem = eventSystem;
     this.#storageSystem = storageSystem;
     this.#dataSourceSystem = new DataSourceSystemAdapter('0.2.0');
@@ -48,112 +56,80 @@ export class VisualizationList extends PanelPlugin {
     const { default: VueJS } = this.getDependence('Vue');
 
     const view = new VueJS({
-      data: () => ({ guid, logSystem, eventSystem, storageSystem }),
+      data: () => ({ guid, eventSystem, storageSystem }),
       render: h => h(PluginComponent),
     }).$mount(selector);
 
-    this.vueComponent = view.$children[0];
-    this.#isMarkedItems = false;
-    this.#colColor = 'color';
-    this.#colBackColor = 'backColor';
-    this.#colTitle = 'title';
-    this.#colSubTitle = 'subTitle';
-    this.#colIsColoredTitle = 'coloredTitle';
-    this.#dataSourceName = '';
+    this.#vueComponent = view.$children[0];
+    this.#logSystem.debug(`${this.#id} initialization complete`);
+    this.#logSystem.info(`${this.#id} initialization complete`);
   }
 
   setPluginConfig(config = {}) {
-    const {
-      isMarkedItems,
-      colColor,
-      colBackColor,
-      colTitle,
-      colSubTitle,
-      colIsColoredTitle,
-      dataSource,
-    } = config;
+    this.#logSystem.debug(`Set new config to ${this.#id}`);
+    this.#logSystem.info(`Set new config to ${this.#id}`);
 
-    if (typeof isMarkedItems !== 'undefined') {
-      this.#isMarkedItems = isMarkedItems;
-      this.vueComponent.setConfig('isMarkedItems', isMarkedItems);
-    }
+    const configProps = Object.keys(this.#config);
 
-    if (typeof colIsColoredTitle !== 'undefined') {
-      this.#colIsColoredTitle = colIsColoredTitle;
-      this.vueComponent.setConfig('colIsColoredTitle', colIsColoredTitle);
-    }
+    for (const [prop, value] of Object.entries(config)) {
+      if (!configProps.includes(prop)) continue;
 
-    if (typeof colColor === 'string') {
-      this.#colColor = colColor;
-      this.vueComponent.setConfig('colColor', colColor);
-    }
+      if (prop === 'dataSource' && value) {
+        if (this.#config[prop]) {
+          this.#logSystem.debug(
+            `Unsubscribing ${this.#id} from DataSourceStatusUpdate({ dataSource: ${this.#config[prop]}, status: success })`
+          );
+          this.#eventSystem.unsubscribe(
+            this.#dataSourceSystemGUID,
+            'DataSourceStatusUpdate',
+            this.#guid,
+            'processDataSourceEvent',
+            { dataSource: this.#config[prop], status: 'success' },
+            );
+          }
 
-    if (typeof colBackColor === 'string') {
-      this.#colBackColor = colBackColor;
-      this.vueComponent.setConfig('colBackColor', colBackColor);
-    }
+        const dsNewName = value;
 
-    if (typeof colTitle === 'string') {
-      this.#colTitle = colTitle;
-      this.vueComponent.setConfig('colTitle', colTitle);
-    }
+        this.#logSystem.debug(
+          `Subscribing ${this.#id} for DataSourceStatusUpdate({ dataSource: ${dsNewName}, status: success })`
+        );
 
-    if (typeof colSubTitle === 'string') {
-      this.#colSubTitle = colSubTitle;
-      this.vueComponent.setConfig('colSubTitle', colSubTitle);
-    }
-
-    if (dataSource !== '' && typeof dataSource !== 'undefined') {
-      if (this.#dataSourceName) {
-        this.#eventSystem.unsubscribe(
+        this.#eventSystem.subscribe(
           this.#dataSourceSystemGUID,
           'DataSourceStatusUpdate',
           this.#guid,
           'processDataSourceEvent',
-          { dataSource: this.#dataSourceName, status: 'success' }
+          { dataSource: dsNewName, status: 'success' },
         );
+
+        const ds = this.#dataSourceSystem.getDataSource(dsNewName);
+
+        if (ds && ds.status === 'success') {
+          const data = this.#storageSystem.session.getRecord(dsNewName);
+          this.loadData(data);
+        }
       }
 
-      this.#dataSourceName = dataSource;
-
-      this.#eventSystem.subscribe(
-        this.#dataSourceSystemGUID,
-        'DataSourceStatusUpdate',
-        this.#guid,
-        'processDataSourceEvent',
-        { dataSource, status: 'success' }
-      );
-
-      const DS = this.#dataSourceSystem.getDataSource(this.#dataSourceName);
-
-      if (DS.status === 'success') {
-        const data = this.#storageSystem.session.getRecord(this.#dataSourceName);
-        this.loadData(data);
-      }
+      this.#config[prop] = value;
+      this.#vueComponent.setConfigProp(prop, value);
+      this.#logSystem.debug(`${this.#id} config prop value "${prop}" set to "${value}"`);
     }
   }
 
   getPluginConfig() {
-    const config = {};
-    if (typeof this.#isMarkedItems !== 'undefined') config.isMarkedItems = this.#isMarkedItems;
-    if (typeof this.#colIsColoredTitle !== 'undefined')
-      config.colIsColoredTitle = this.#colIsColoredTitle;
-    if (typeof this.#colColor !== 'undefined') config.colColor = this.#colColor;
-    if (typeof this.#colBackColor !== 'undefined') config.colBackColor = this.#colBackColor;
-    if (typeof this.#colTitle !== 'undefined') config.colTitle = this.#colTitle;
-    if (typeof this.#colSubTitle !== 'undefined') config.colSubTitle = this.#colSubTitle;
-    if (typeof this.#dataSourceName !== 'undefined') config.dataSource = this.#dataSourceName;
-    return config;
+    return { ...this.#config };
   }
 
   loadData(data) {
-    this.vueComponent.setDataset(data);
+    this.#vueComponent.setDataset(data);
   }
 
   processDataSourceEvent(eventData) {
     const { dataSource, status } = eventData;
-    this.#dataSourceName = dataSource;
-    const data = this.#storageSystem.session.getRecord(this.#dataSourceName);
+    const data = this.#storageSystem.session.getRecord(dataSource);
+    this.#logSystem.debug(
+      `${this.#id} process DataSourceStatusUpdate({ dataSource: ${dataSource}, status: ${status} })`
+    );
     this.loadData(data);
   }
 
@@ -186,8 +162,6 @@ export class VisualizationList extends PanelPlugin {
           propName: 'colTitle',
           attrs: {
             label: 'Имя колонки с основным заголовком',
-            propValue: 'title',
-            required: true,
           },
         },
         {
@@ -195,8 +169,6 @@ export class VisualizationList extends PanelPlugin {
           propName: 'colSubTitle',
           attrs: {
             label: 'Имя колонки с подзаголовком',
-            propValue: 'subTitle',
-            required: true,
           },
         },
         {
@@ -204,8 +176,6 @@ export class VisualizationList extends PanelPlugin {
           propName: 'colIsColoredTitle',
           attrs: {
             label: 'Имя колонки с флагом окраски заголовка',
-            propValue: 'coloredTitle',
-            required: true,
           },
         },
         {
@@ -213,8 +183,6 @@ export class VisualizationList extends PanelPlugin {
           propName: 'colColor',
           attrs: {
             label: 'Имя колонки с цветом заголовка',
-            propValue: 'color',
-            required: true,
           },
         },
         {
@@ -222,14 +190,14 @@ export class VisualizationList extends PanelPlugin {
           propName: 'colBackColor',
           attrs: {
             label: 'Имя колонки с цветом фона',
-            propValue: 'backColor',
-            required: true,
           },
         },
         {
           component: 'checkbox',
           propName: 'isMarkedItems',
-          attrs: { label: 'Включить маркировку списка' },
+          attrs: {
+            label: 'Включить маркировку списка'
+          },
         },
       ],
     };
