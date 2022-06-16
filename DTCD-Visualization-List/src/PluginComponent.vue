@@ -1,27 +1,32 @@
 <template>
-  <div class="visualization-list-container">
+  <div v-if="dataset.length < 1" class="VisualizationList NoData">
+    <span class="FontIcon name_infoCircleOutline Icon"></span>
+    Нет данных для отображения
+  </div>
+  <div v-else class="VisualizationList">
     <div
-      v-for="(item, i) in dataset"
-      :key="`item-${i}`"
+      v-for="(item, index) in dataset"
+      :key="`item-${index}`"
       class="list-item"
-      :class="{ selected: i === selectedItem }"
-      :style="{ backgroundColor: item[colBackColor] }"
-      @click="clickListItem(item, i)"
+      :class="{ selected: index === selectedItem }"
+      :style="{ backgroundColor: item[config.colBackColor] }"
+      @click="clickListItem(item, index)"
     >
-      <div v-show="isMarkedItems" class="item-icon">
-        <svg width="12" height="12" viewBox="0 0 12 12">
-          <circle cx="6" cy="6" r="6" :fill="getFromItem(item, colColor) || '#51515C'" />
-        </svg>
+      <div v-if="config.isMarkedItems" class="item-icon">
+        <span
+          class="FontIcon name_dot Marker"
+          :style="{ color: getFromItem(item, config.colColor) }"
+        />
       </div>
       <div class="item-content">
         <span
           class="main-text"
           :style="{
-            color: getFromItem(item, colIsColoredTitle) ? getFromItem(item, colColor) : '',
+            color: getFromItem(item, config.colIsColoredTitle) ? getFromItem(item, config.colColor) : '',
           }"
-          v-text="item[colTitle]"
+          v-text="item[config.colTitle]"
         />
-        <span class="sub-text" v-text="getFromItem(item, colSubTitle)" />
+        <span class="sub-text" v-text="getFromItem(item, config.colSubTitle)"/>
       </div>
     </div>
   </div>
@@ -31,22 +36,23 @@
 export default {
   name: 'PluginComponent',
   data: self => ({
-    logSystem: self.$root.logSystem,
     eventSystem: self.$root.eventSystem,
     storageSystem: self.$root.storageSystem,
-    selectedItem: null,
-    isMarkedItems: true,
-    colColor: 'color',
-    colBackColor: 'backColor',
-    colTitle: 'title',
-    colSubTitle: 'subTitle',
-    colIsColoredTitle: 'coloredTitle',
-    dataset: [],
     tokenName: '',
+    selectedItem: null,
+    dataset: [],
+    config: {
+      colTitle: 'title',
+      colSubTitle: 'subTitle',
+      colColor: 'color',
+      colBackColor: 'backColor',
+      colIsColoredTitle: 'isColoredTitle',
+      isMarkedItems: false,
+    },
   }),
   methods: {
-    setConfig(name, value) {
-      this[name] = value;
+    setConfigProp(prop, value) {
+      this.config[prop] = value;
     },
 
     getFromItem(item, key) {
@@ -63,7 +69,7 @@ export default {
       // if (this.tokenName) {
       //   this.storageSystem.tokenStorage.putRecord(
       //     this.tokenName,
-      //     item[this.colTitle]
+      //     item[this.config.colTitle]
       //   );
       // }
       this.eventSystem.publishEvent('ListItemClicked', item);
@@ -73,5 +79,62 @@ export default {
 </script>
 
 <style lang="sass">
-@import ./styles/component
+$border: 2px solid var(--background_secondary)
+
+.VisualizationList
+  width: 100%
+  height: 100%
+  display: flex
+  flex-direction: column
+  overflow-y: auto
+  color: var(--text_secondary)
+  font-family: 'Proxima Nova'
+
+  &.NoData
+    align-items: center
+    justify-content: center
+
+    .Icon
+      color: var(--border_secondary)
+      font-size: 100px
+      margin-bottom: 8px
+
+  .list-item
+    flex: 1 0
+    display: flex
+
+    &:not(:first-child)
+      border-top: $border
+
+    &:not(:last-child)
+      border-bottom: $border
+
+    &.selected
+      outline: 2px solid var(--button_primary)
+      outline-offset: -2px
+
+    .item-icon
+      padding: 12px 16px
+      padding-right: 0
+
+      .Marker
+        color: var(--text_main)
+        font-size: 40px
+        margin-top: -10px
+        margin-left: -12px
+
+    .item-content
+      padding: 12px 16px
+
+      .main-text
+        font-size: 15px
+        font-weight: 600
+        line-height: 18px
+
+      .sub-text
+        color: var(--text_secondary)
+        font-size: 11px
+        font-weight: 400
+        line-height: 18px
+
 </style>
