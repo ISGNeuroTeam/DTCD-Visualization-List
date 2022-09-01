@@ -66,13 +66,7 @@ export default {
 
     clickListItem(item, itenIndex) {
       this.selectedItem = itenIndex;
-      // if (this.tokenName) {
-      //   this.storageSystem.tokenStorage.putRecord(
-      //     this.tokenName,
-      //     item[this.config.colTitle]
-      //   );
-      // }
-      this.eventSystem.publishEvent('ListItemClicked', item);
+      this.eventSystem.publishEvent('Clicked', item);
     },
   },
 };
@@ -88,7 +82,7 @@ $border: 2px solid var(--background_secondary)
   flex-direction: column
   overflow-y: auto
   color: var(--text_secondary)
-  font-family: 'Proxima Nova'
+  font-family: 'Proxima Nova', serif
 
   &.NoData
     align-items: center

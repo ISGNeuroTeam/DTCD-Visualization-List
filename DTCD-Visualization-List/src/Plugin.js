@@ -40,11 +40,11 @@ export class VisualizationList extends PanelPlugin {
     const eventSystem = new EventSystemAdapter('0.4.0', guid);
     const storageSystem = new StorageSystemAdapter('0.5.0');
 
-    eventSystem.registerPluginInstance(this);
+    eventSystem.registerPluginInstance(this, ['Clicked']);
 
     this.#guid = guid;
     this.#id = `${pluginMeta.name}[${guid}]`;
-    this.#logSystem = new LogSystemAdapter('0.5.0', guid, pluginMeta.name);;
+    this.#logSystem = new LogSystemAdapter('0.5.0', guid, pluginMeta.name);
     this.#eventSystem = eventSystem;
     this.#storageSystem = storageSystem;
     this.#dataSourceSystem = new DataSourceSystemAdapter('0.2.0');
