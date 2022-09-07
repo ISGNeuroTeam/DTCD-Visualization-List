@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Changed
 - layout styles
 - panel config logic
+- Refactoring for new SDK version
 
 ## [0.2.0]
 

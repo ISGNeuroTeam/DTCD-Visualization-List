@@ -4,29 +4,34 @@
     Нет данных для отображения
   </div>
   <div v-else class="VisualizationList">
-    <div
-      v-for="(item, index) in dataset"
-      :key="`item-${index}`"
-      class="list-item"
-      :class="{ selected: index === selectedItem }"
-      :style="{ backgroundColor: item[config.colBackColor] }"
-      @click="clickListItem(item, index)"
-    >
-      <div v-if="config.isMarkedItems" class="item-icon">
+    <div v-if="config.title" class="VisualizationList__title">
+      {{ config.title }}
+    </div>
+    <div class="VisualizationList__container">
+      <div
+          v-for="(item, index) in dataset"
+          :key="`item-${index}`"
+          class="list-item"
+          :class="{ selected: index === selectedItem }"
+          :style="{ backgroundColor: item[config.colBackColor] }"
+          @click="clickListItem(item, index)"
+      >
+        <div v-if="config.isMarkedItems" class="item-icon">
         <span
-          class="FontIcon name_dot Marker"
-          :style="{ color: getFromItem(item, config.colColor) }"
+            class="FontIcon name_dot Marker"
+            :style="{ color: getFromItem(item, config.colColor) }"
         />
-      </div>
-      <div class="item-content">
+        </div>
+        <div class="item-content">
         <span
-          class="main-text"
-          :style="{
+            class="main-text"
+            :style="{
             color: getFromItem(item, config.colIsColoredTitle) ? getFromItem(item, config.colColor) : '',
           }"
-          v-text="item[config.colTitle]"
+            v-text="item[config.colTitle]"
         />
-        <span class="sub-text" v-text="getFromItem(item, config.colSubTitle)"/>
+          <span class="sub-text" v-text="getFromItem(item, config.colSubTitle)"/>
+        </div>
       </div>
     </div>
   </div>
@@ -42,6 +47,7 @@ export default {
     selectedItem: null,
     dataset: [],
     config: {
+      title: '',
       colTitle: 'title',
       colSubTitle: 'subTitle',
       colColor: 'color',
@@ -51,6 +57,27 @@ export default {
     },
   }),
   methods: {
+    setTitle(value = '') {
+      this.config.title = value;
+    },
+    setColTitle(value = '') {
+      this.config.colTitle = value;
+    },
+    setColSubTitle(value = '') {
+      this.config.colSubTitle = value;
+    },
+    setColColor(value = '') {
+      this.config.colColor = value;
+    },
+    setColBackColor(value = '') {
+      this.config.colBackColor = value;
+    },
+    setColIsColoredTitle(value = '') {
+      this.config.colIsColoredTitle = value;
+    },
+    setIsMarkedItems(value = '') {
+      this.config.isMarkedItems = value;
+    },
     setConfigProp(prop, value) {
       this.config[prop] = value;
     },
@@ -88,8 +115,18 @@ $border: 2px solid var(--background_secondary)
   flex-direction: column
   overflow-y: auto
   color: var(--text_secondary)
-  font-family: 'Proxima Nova'
-
+  font-family: 'Proxima Nova', sans-serif
+  &__title
+    font-weight: 600
+    font-size: 15px
+    line-height: 18px
+    padding: 10px
+  &__container
+    width: 100%
+    height: 100%
+    display: flex
+    flex-direction: column
+    overflow-y: auto
   &.NoData
     align-items: center
     justify-content: center
