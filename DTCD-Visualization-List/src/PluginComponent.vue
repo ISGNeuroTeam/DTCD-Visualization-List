@@ -93,13 +93,7 @@ export default {
 
     clickListItem(item, itenIndex) {
       this.selectedItem = itenIndex;
-      // if (this.tokenName) {
-      //   this.storageSystem.tokenStorage.putRecord(
-      //     this.tokenName,
-      //     item[this.config.colTitle]
-      //   );
-      // }
-      this.eventSystem.publishEvent('ListItemClicked', item);
+      this.eventSystem.publishEvent('Clicked', item);
     },
   },
 };
@@ -116,17 +110,20 @@ $border: 2px solid var(--background_secondary)
   overflow-y: auto
   color: var(--text_secondary)
   font-family: 'Proxima Nova', sans-serif
+
   &__title
     font-weight: 600
     font-size: 15px
     line-height: 18px
     padding: 10px
+
   &__container
     width: 100%
     height: 100%
     display: flex
     flex-direction: column
     overflow-y: auto
+
   &.NoData
     align-items: center
     justify-content: center
