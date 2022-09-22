@@ -188,6 +188,7 @@ export class VisualizationList extends PanelPlugin {
           propName: 'colIsColoredTitle',
           attrs: {
             label: 'Имя колонки с флагом окраски заголовка',
+            title: 'Чтобы цвет применился, значение этой колонки должно быть или `true` или `1`.',
           },
         },
         {
