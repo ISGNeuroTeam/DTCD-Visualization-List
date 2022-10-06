@@ -153,10 +153,6 @@ export class VisualizationList extends PanelPlugin {
       fields: [
         {
           component: 'title',
-          propValue: 'Общие настройки',
-        },
-        {
-          component: 'title',
           propValue: 'Источник данных',
         },
         {
@@ -168,7 +164,13 @@ export class VisualizationList extends PanelPlugin {
             required: true,
           },
         },
+        {
+          component: 'divider',
+        },
         ...this.defaultFields,
+        {
+          component: 'divider',
+        },
         {
           component: 'text',
           propName: 'colTitle',
@@ -188,6 +190,7 @@ export class VisualizationList extends PanelPlugin {
           propName: 'colIsColoredTitle',
           attrs: {
             label: 'Имя колонки с флагом окраски заголовка',
+            title: 'Чтобы цвет применился, значение этой колонки должно быть или `true` или `1`.',
           },
         },
         {
@@ -203,6 +206,9 @@ export class VisualizationList extends PanelPlugin {
           attrs: {
             label: 'Имя колонки с цветом фона',
           },
+        },
+        {
+          component: 'divider',
         },
         {
           component: 'checkbox',

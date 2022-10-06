@@ -26,7 +26,7 @@
         <span
             class="main-text"
             :style="{
-            color: getFromItem(item, config.colIsColoredTitle) ? getFromItem(item, config.colColor) : '',
+            color: isTrueOrFalse(item[config.colIsColoredTitle]) ? getFromItem(item, config.colColor) : '',
           }"
             v-text="item[config.colTitle]"
         />
@@ -95,6 +95,17 @@ export default {
       this.selectedItem = itenIndex;
       this.eventSystem.publishEvent('Clicked', item);
     },
+
+    isTrueOrFalse(value = '') {
+      switch (value) {
+        case 'true':
+        case '1':
+        case 1:
+        case true:
+          return true;
+      }
+      return false;
+    }
   },
 };
 </script>
