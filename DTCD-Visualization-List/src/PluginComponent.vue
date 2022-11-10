@@ -127,6 +127,7 @@ $border: 2px solid var(--background_secondary)
     font-size: 15px
     line-height: 18px
     padding: 10px
+    color: var(--text_main)
 
   &__container
     width: 100%
