@@ -233,6 +233,13 @@ export class VisualizationList extends PanelPlugin {
 
     this.setPluginConfig(newState);
 
-    if (newState.dataset) this.#vueComponent.dataset = newState.dataset;
+    const vueNamesFields = [
+      'dataset',
+    ];
+
+    for (const [prop, value] of Object.entries(newState)) {
+      if (!vueNamesFields.includes(prop)) continue;
+      this.#vueComponent[prop] = value;
+    }
   }
 }
