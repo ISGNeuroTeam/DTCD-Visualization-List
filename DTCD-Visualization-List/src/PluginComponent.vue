@@ -123,9 +123,8 @@ $border: 2px solid var(--background_secondary)
   font-family: 'Proxima Nova', sans-serif
 
   &__title
-    font-weight: 600
-    font-size: 15px
-    line-height: 18px
+    font-size: 18px
+    font-weight: 700
     padding: 10px
     color: var(--text_main)
 
